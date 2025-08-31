@@ -2,25 +2,21 @@ Ext.application({
     name: 'EmptyApp',
 
     requires: [
-        'Ext.container.Viewport'
+        'Ext.container.Viewport',
+        'EmptyApp.model.Product',
+        'EmptyApp.store.Products',
+        'EmptyApp.view.catalog.ProductsGrid',
+        'EmptyApp.view.catalog.ProductCard'
     ],
 
-    controllers: [
-        'Login'
-    ],
+    controllers: ['Login'],
 
-    views: [
-        'login.Form'
-    ],
-    launch: function() {
+    views: ['login.Form'],
+    launch: function () {
         var isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
 
         var viewport = Ext.create('Ext.container.Viewport', {
-            layout: {
-                type: 'vbox',
-                align: 'center',
-                pack: 'center'
-            },
+            layout: 'fit',
             items: []
         });
 
@@ -28,45 +24,58 @@ Ext.application({
             viewport.add({
                 xtype: 'panel',
                 title: 'Главная страница',
-                width: '80%',
-                height: 500,
+                width: '100%',
+                height: '100%',
                 layout: 'fit',
-                tbar: [{
-                    xtype: 'button',
-                    text: 'Товары',
-                    handler: function() {
-                        var tabPanel = Ext.ComponentQuery.query('tabpanel')[0];
+                tbar: [
+                    {
+                        xtype: 'button',
+                        text: 'Товары',
+                        handler: function () {
+                            var mainPanel = this.up('panel');
+                            var tabPanel = mainPanel.down('tabpanel');
 
-                        // Create a new catalog tab each time
-                        var catalogTab = tabPanel.add({
-                            title: 'Каталог',
-                            html: 'Здесь будет каталог товаров',
-                            closable: true
-                        });
+                            // Create a new catalog tab each time
+                            var catalogTab = tabPanel.add({
+                                title: 'Товары',
+                                xtype: 'productsgrid',
+                                closable: true
+                            });
 
-                        tabPanel.setActiveTab(catalogTab);
+                            tabPanel.setActiveTab(catalogTab);
+                        }
+                    },
+                    {
+                        xtype: 'button',
+                        text: 'Выйти',
+                        handler: function () {
+                            localStorage.removeItem('isAuthenticated');
+
+                            window.location.reload();
+                        }
                     }
-                }, {
-                    xtype: 'button',
-                    text: 'Выйти',
-                    handler: function() {
-                        localStorage.removeItem('isAuthenticated');
-
-                        window.location.reload();
+                ],
+                items: [
+                    {
+                        xtype: 'tabpanel',
+                        activeTab: 0,
+                        items: []
                     }
-                }],
-                items: [{
-                    xtype: 'tabpanel',
-                    activeTab: 0,
-                    items: [{
-                        title: 'Главная',
-                        html: 'Добро пожаловать в приложение!'
-                    }]
-                }]
+                ]
             });
         } else {
             viewport.add({
-                xtype: 'loginform'
+                xtype: 'container',
+                layout: {
+                    type: 'vbox',
+                    align: 'center',
+                    pack: 'center'
+                },
+                items: [
+                    {
+                        xtype: 'loginform'
+                    }
+                ]
             });
         }
     }

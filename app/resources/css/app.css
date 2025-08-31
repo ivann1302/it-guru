@@ -17,3 +17,8 @@
 .custom-button:hover {
     background-color: #2980b9;
 }
+
+.zero-quantity {
+    background-color: #ffcccc !important;
+    color: #cc0000 !important;
+}
